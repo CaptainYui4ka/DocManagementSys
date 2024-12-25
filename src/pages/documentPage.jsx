@@ -6,16 +6,34 @@ function DocumentForm() {
   const [documentName, setDocumentName] = useState('');
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredDocuments, setFilteredDocuments] = useState(documents)
 
-  useEffect(() =>{
+  useEffect(() => {
     fetchDocuments();
   }, []);
+
+  useEffect(() => {
+    setFilteredDocuments(documents);
+  }, [documents]);
+
+  useEffect(() => {
+    const filtered = documents.filter((doc) =>
+      doc.agent.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredDocuments(filtered);
+  }, [searchTerm, documents]);
 
   const fetchDocuments = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents`);
-      const data = await response.json();
-      setDocuments(data);
+      if (response.ok) {
+        const data = await response.json();
+        setDocuments(data);
+        setFilteredDocuments(data); // Для синхронизации с отфильтрованными документами
+      } else {
+        console.error("Не удалось загрузить документы.");
+      }
     } catch (error) {
       console.error("Ошибка при загрузке документов:", error);
     }
@@ -25,13 +43,13 @@ function DocumentForm() {
     if (!window.confirm("Вы уверены, что хотите удалить этот документ?")) {
       return;
     }
-  
+
     try {
       console.log(process.env.REACT_APP_API_URL);
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/${id}`, {
         method: "DELETE",
       });
-  
+
       // Проверяем статус ответа
       if (response.ok) {
         setDocuments(documents.filter((doc) => doc._id !== id)); // Удаляем документ из списка
@@ -53,7 +71,7 @@ function DocumentForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(!agent || !documentName || !file){
+    if (!agent || !documentName || !file) {
       setMessage("Все поля обязательны для заполнения");
       return;
     }
@@ -63,7 +81,7 @@ function DocumentForm() {
     formData.append('documentName', documentName);
     formData.append('file', file);
 
-    try{
+    try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents`, {
         method: 'POST',
         body: formData
@@ -122,17 +140,24 @@ function DocumentForm() {
 
         <section className="document-list">
           <h2>Загруженные документы</h2>
-          {documents.length > 0 ? (
+          <input
+            type='text'
+            placeholder='Поиск по агенту...'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {filteredDocuments.length > 0 ? (
             <ul>
-              {documents.map((doc) => (
+              {filteredDocuments.map((doc) => (
                 <li key={doc._id}>
                   <span>
                     {doc.documentName} - {doc.agent}
                   </span>
-                  <a href={`${process.env.REACT_APP_API_URL}/${doc.filePath}`}
-                    className='document-download'
+                  <a
+                    href={`${process.env.REACT_APP_API_URL}/${doc.filePath}`}
                     target="_blank"
-                    rel="noopener noreferrer">
+                    rel="noopener noreferrer"
+                  >
                     Скачать
                   </a>
                   <button onClick={() => handleDelete(doc._id)}>Удалить</button>
@@ -140,7 +165,7 @@ function DocumentForm() {
               ))}
             </ul>
           ) : (
-            <p>Нет загруженных документов</p>
+            <p>Документы не найдены.</p>
           )}
         </section>
       </main>
