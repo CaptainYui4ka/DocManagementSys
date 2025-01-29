@@ -1,9 +1,10 @@
 {
   "name": "document",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "cra-template": "1.2.0",
+    "mdb-react-ui-kit": "^9.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-scripts": "5.0.1"
