@@ -18,7 +18,6 @@ const AddAgent = ({ fetchDocuments }) => {
             setMessage("Все поля обязательны для заполнения");
             return;
         }
-
         const formData = new FormData();
         formData.append('agent', agent);
         formData.append('documentName', documentName);
@@ -27,14 +26,10 @@ const AddAgent = ({ fetchDocuments }) => {
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents`, {
                 method: 'POST',
-                body: formData
+                body: formData,
             });
-
             if (response.ok) {
                 setMessage("Документ успешно загружен!");
-                setAgent("");
-                setDocumentName("");
-                setFile(null);
                 fetchDocuments(); // Обновляем список документов после загрузки
             } else {
                 setMessage("Не удалось загрузить документ.");
@@ -46,7 +41,7 @@ const AddAgent = ({ fetchDocuments }) => {
     };
 
     return (
-        <div>
+        <div className='add-agent'>
             <section className="form-section">
                 <h2>Добавить новый документ</h2>
                 <form className="document-form" onSubmit={handleSubmit}>
@@ -57,6 +52,7 @@ const AddAgent = ({ fetchDocuments }) => {
                             value={agent}
                             onChange={(e) => setAgent(e.target.value)}
                             placeholder="Введите имя агента"
+                            required
                         />
                     </label>
                     <label>
@@ -66,11 +62,12 @@ const AddAgent = ({ fetchDocuments }) => {
                             value={documentName}
                             onChange={(e) => setDocumentName(e.target.value)}
                             placeholder="Введите название документа"
+                            required
                         />
                     </label>
                     <label className="file-upload">
                         Выбрать файл:
-                        <input type="file" onChange={handleFileChange} />
+                        <input type="file" onChange={handleFileChange} required />
                     </label>
                     <button type="submit">Загрузить</button>
                 </form>

@@ -3,12 +3,25 @@ import '../components/documentPages.css'
 
 import AddAgent from '../components/addAgent';
 function DocumentForm() {
-  const [documents, setDocuments] = useState([])
+  const [documents, setDocuments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredDocuments, setFilteredDocuments] = useState(documents)
+  const [filteredDocuments, setFilteredDocuments] = useState(documents);
+  const [oldDocuments, setOldDocuments] = useState([]);
 
   useEffect(() => {
     fetchDocuments();
+
+    const fetchOldDocuments = async () => {
+      try{
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/old-documents`);
+        const data = await response.json();
+          setOldDocuments(data);
+        } catch (error) {
+          console.error("Ошибка при получении старых документов:", error);
+        }
+      };
+
+      fetchOldDocuments();
   }, []); 
 
   useEffect(() => {

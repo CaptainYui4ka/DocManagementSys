@@ -1,3 +1,9 @@
+@font-face {
+  font-family: 'Nothing';
+  src: url('../../public/nothing-font.otf') format('opentype');
+}
+
+
 body{
     font-family: Arial, sans-serif;
     background-color: #f8f9fa;
