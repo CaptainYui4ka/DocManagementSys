@@ -46,7 +46,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage});
 app.use("/uploads", express.static("uploads"));
-app.use("/oldDoc", express.static("oldDoc"));
+
+app.get("/api/documents", async(req, res) => {
+  try{
+      const documents = await Document.find().sort({uploadedAt: -1});
+      res.json(documents);
+  } catch(error){
+      console.error(error);
+      res.status(500).json({message: "Ошибка получения списка документов!"})
+  }
+});
 
 app.post("/api/documents", upload.single("file"), async(req, res) => {
   try{
@@ -84,31 +93,6 @@ app.delete("/api/documents/:id", async (req, res) => {
     console.error("Ошибка на сервере при удалении документа:", error);
     res.status(500).json({ message: "Ошибка при удалении документа." });
   }
-});
-
-app.get("/api/documents", async(req, res) => {
-  try{
-      const documents = await Document.find().sort({uploadedAt: -1});
-      res.json(documents);
-  } catch(error){
-      console.error(error);
-      res.status(500).json({message: "Ошибка получения списка документов!"})
-  }
-});
-
-app.get("/api/old-documents", (req, res) => {
-  const oldDocDir = path.join(__dirname, 'oldDoc');
-  fs.readdir(oldDocDir, (err, files) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Ошибка получения старых документов!" });
-    }
-    const oldDocuments = files.map(file => ({
-      documentName: file,
-      filePath: `oldDoc/${file}`
-    }));
-    res.status(200).json(oldDocuments);
-  });
 });
 
 const PORT = 5000;
