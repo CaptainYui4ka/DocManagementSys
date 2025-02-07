@@ -6,22 +6,10 @@ function DocumentForm() {
   const [documents, setDocuments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredDocuments, setFilteredDocuments] = useState(documents);
-  const [oldDocuments, setOldDocuments] = useState([]);
+  //const [oldDocuments, setOldDocuments] = useState([]);
 
   useEffect(() => {
     fetchDocuments();
-
-    const fetchOldDocuments = async () => {
-      try{
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/old-documents`);
-        const data = await response.json();
-          setOldDocuments(data);
-        } catch (error) {
-          console.error("Ошибка при получении старых документов:", error);
-        }
-      };
-
-      fetchOldDocuments();
   }, []); 
 
   useEffect(() => {
@@ -35,7 +23,7 @@ function DocumentForm() {
     setFilteredDocuments(filtered);
   }, [searchTerm, documents]);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = async () => {  
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents`);
       if (response.ok) {
